@@ -1,16 +1,21 @@
 {
-  "name": "mobilus",
-  "version": "0.0.1",
-  "description": "Backend for Android QoS testing app",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "BSD-2-Clause",
-  "dependencies": {
-    "jade": "~1.9.2",
-    "express": "~4.12.4",
-    "body-parser": "~1.12.4"
-  }
+    "name": "mobilus",
+    "version": "0.0.1",
+    "description": "Backend for Android QoS testing app",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "BSD-2-Clause",
+    "dependencies": {
+        "jade": "~1.9.2",
+        "express": "~4.12.4",
+        "body-parser": "~1.12.4",
+        "morgan": "~1.5.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Valentin-Paramonov/mobilus.git"
+    }
 }
