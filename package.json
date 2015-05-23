@@ -2,7 +2,7 @@
     "name": "mobilus",
     "version": "0.0.1",
     "description": "Backend for Android QoS testing app",
-    "main": "server.js",
+    "main": "mobilus.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
