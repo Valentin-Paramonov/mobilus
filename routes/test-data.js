@@ -21,8 +21,7 @@ function randomData(bytes) {
 
 router.route('/')
     .post(function(request, response) {
-        console.dir(request.body);
-        var stream = fs.createWriteStream('./data.bin');
+        var stream = fs.createWriteStream('/dev/null');
         request.on('data', function(data) {
             stream.write(data);
         });
