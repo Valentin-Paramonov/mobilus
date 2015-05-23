@@ -6,10 +6,10 @@ var mobilus = express();
 var HOME = __dirname,
     PORT = 4848;
 
+mobilus.locals.pretty = true;
 mobilus.use(bodyParser.json());
 mobilus.set('view engine', 'jade');
 mobilus.set('views', HOME + '/views');
-mobilus.locals.pretty = true;
 
 mobilus.use('/test-data', require('./routes/test-data'));
 

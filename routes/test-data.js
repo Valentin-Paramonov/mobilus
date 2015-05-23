@@ -1,9 +1,9 @@
+var ONE_KB = 1024;
+
 var express = require('express'),
     bodyParser = require('body-parser'),
     HttpStatus = require('http-status-codes'),
     fs = require('fs');
-
-var ONE_KB = 1024;
 
 var router = express.Router();
 module.exports = router;
@@ -21,8 +21,15 @@ function randomData(bytes) {
 
 router.route('/')
     .post(function(request, response) {
-        fs.writeFile('/dev/null', request.body, function() {
-            response.sendStatus(HttpStatus.OK);
+        console.dir(request.body);
+        var stream = fs.createWriteStream('./data.bin');
+        request.on('data', function(data) {
+            stream.write(data);
+        });
+        request.on('end', function() {
+            stream.end();
+            response.status(HttpStatus.OK)
+                .json();
         });
     })
     .get(function(request, response) {
