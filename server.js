@@ -1,26 +1,24 @@
-var express = require('express');
-var bodyParser = require('body-parser')
+var express = require('express'),
+    bodyParser = require('body-parser');
+
 var server = express();
 
-var HOME = '.';
-var PORT = 4848;
+var HOME = __dirname,
+    PORT = 4848;
 
 server.use(bodyParser.json());
-server.use(bodyParser.raw({limit: '5mb'}));
 server.set('view engine', 'jade');
 server.set('views', HOME + '/views');
 server.locals.pretty = true;
 
+server.use('/test-data', require('./routes/test-data'));
+
 server.get('/', function(request, response) {
-    response.send('Data received!');    
+    response.send('Data received!');
 });
 
 server.post('/', function(request, response) {
     console.log(request.body);
-    response.send(request.body);
-});
-
-server.post('/echo', function(request, response) {
     response.send(request.body);
 });
 
@@ -29,5 +27,5 @@ server.get('/log', function(request, response) {
 });
 
 server.listen(PORT, function() {
-    console.log('Listening on port ' + PORT);    
+    console.log('Listening on port ' + PORT);
 });
