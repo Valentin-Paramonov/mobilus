@@ -10,15 +10,19 @@ module.exports = router;
 
 bodyParser.raw({ limit: '5mb' });
 
-function randomData(bytes) {
-    var fd = fs.openSync('/dev/urandom', 'r');
-    var buffer = new Buffer(bytes);
-    fs.read(fd, buffer, 0, bytes, 0, function() {
-        fs.close(fd);
+function acquireRandomDataBuffer(size, onBufferAcquired) {
+    fs.open('/dev/urandom', 'r', function(err, fd) {
+        if (err) {
+            onBufferAcquired(err);
+            return;
+        }
+        var buffer = new Buffer(size);
+        fs.read(fd, buffer, 0, size, 0, function() {
+            fs.close(fd);
+        });
+        onBufferAcquired(null, buffer);
     });
-    return buffer;
 }
-
 router.route('/')
     .post(function(request, response) {
         var stream = fs.createWriteStream('/dev/null');
@@ -38,8 +42,14 @@ router.route('/')
                 .json("failed to parse 'bytes' parameter");
             return;
         }
-        response.write(randomData(bytes), function() {
-            response.status(HttpStatus.OK)
-                .end();
+        acquireRandomDataBuffer(bytes, function(err, buffer) {
+            if (err) {
+                response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
+                return;
+            }
+            response.write(buffer, function() {
+                response.status(HttpStatus.OK)
+                    .end();
+            });
         });
     });
