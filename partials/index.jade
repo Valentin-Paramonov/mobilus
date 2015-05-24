@@ -5,30 +5,42 @@ html
     body(ng-app='mobileStats', ng-controller='statsController')
         table.table-striped.table-bordered.table-condensed
             tr
-                th Cell Info
-                th GPS Data
-                th GSM Data
-                th Network Statistics
                 th Test Date
+                th GSM Data
+                th Cell Info
+                th Network Statistics
+                th GPS Data
                 th User Comments
             tr(ng-repeat='stat in stats')
-                td
-                    h5(ng-init='cellInfo = stat.cellInfo ') GSM:
-                    ul
-                        li(ng-repeat='(k,v) in cellInfo.GSM') {{ k + ': ' + v }}
-                td
-                    ul(ng-init='gpsData = stat.gpsData')
-                        li(ng-repeat='(k,v) in gpsData') {{ k + ': ' + v }}
-                td
-                    ul
-                        li(ng-repeat='(k,v) in stat.gsmData') {{ k + ': ' + v }}
-                td
-                    ul
-                        li(ng-repeat='(k,v) in stat.networkStats') {{ k + ': ' + v }}
                 td {{ stat.testPerformedAt | date:'yyyy-MM-dd HH:mm:ss' }}
                 td
-                    ul
-                        li(ng-repeat='(k,v) in stat.userComments') {{ k + ': ' + v }}
+                    dl.dl-horizontal
+                        dt(ng-repeat-start='(k,v) in stat.gsmData') {{ k }}
+                        dd(ng-repeat-end) {{ v }}
+                td
+                    dl(ng-repeat='(type,info) in stat.cellInfo').dl-horizontal
+                        dt {{ type }}
+                        dd
+                        dt(ng-repeat-start='(k,v) in info') {{ k }}
+                        dd(ng-repeat-end) {{ v }}
+                td
+                    dl.dl-horizontal
+                        dt(ng-repeat-start='(k,v) in stat.networkStats') {{ k }}
+                        dd(ng-repeat-end) {{ v }}
+                td
+                    dl.dl-horizontal
+                        dt(ng-repeat-start='(k,v) in stat.gpsData') {{ k }}
+                        dd(ng-repeat-end) {{ v }}
+                td
+                    dl(ng-init='comments = stat.userComments').dl-horizontal
+                        dt Contact Phone
+                        dd {{ comments.contactPhone }}
+                        dt Complaints
+                        dd(ng-repeat='complaint in comments.complaints') {{ complaint }}
+                        dt Comment:
+                        dd
+                            textarea(readonly).form-control {{ comments.comment }}
+
 
         script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js')
         script(src='lib/mobile-stats.js')
