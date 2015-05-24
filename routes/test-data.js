@@ -1,13 +1,12 @@
-const
-    ONE_KB = 1024,
-    ONE_MB = 1024 * ONE_KB,
-    MAX_ALLOWED_BYTES = 5 * ONE_MB;
+const ONE_KB = 1024;
+const ONE_MB = 1024 * ONE_KB;
+const MAX_ALLOWED_BYTES = 5 * ONE_MB;
 
 module.exports = (function() {
-    var router = require('express').Router(),
-        bodyParser = require('body-parser'),
-        HttpStatus = require('http-status-codes'),
-        fs = require('fs');
+    var router = require('express').Router();
+    var bodyParser = require('body-parser');
+    var HttpStatus = require('http-status-codes');
+    var fs = require('fs');
 
     bodyParser.raw({ limit: '5mb' });
 
@@ -17,8 +16,7 @@ module.exports = (function() {
                 response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
             } else {
                 response.write(buffer, function() {
-                    response.status(HttpStatus.OK)
-                        .end();
+                    response.status(HttpStatus.OK).end();
                 });
             }
         });
@@ -52,11 +50,9 @@ module.exports = (function() {
         .get(function(request, response) {
             var bytes = +(request.query.bytes || ONE_KB);
             if (isNaN(bytes)) {
-                response.status(HttpStatus.BAD_REQUEST)
-                    .json('The number of bytes must be a number');
+                response.status(HttpStatus.BAD_REQUEST).json('The number of bytes must be a number');
             } else if (bytes > MAX_ALLOWED_BYTES) {
-                response.status(HttpStatus.BAD_REQUEST)
-                    .json('Max allowed bytes is ' + MAX_ALLOWED_BYTES);
+                response.status(HttpStatus.BAD_REQUEST).json('Max allowed bytes is ' + MAX_ALLOWED_BYTES);
             } else {
                 writeRandomDataToResponse(bytes, response);
             }
