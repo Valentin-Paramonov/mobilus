@@ -1,4 +1,6 @@
-var ONE_KB = 1024;
+const ONE_KB = 1024,
+    ONE_MB = 1024 * ONE_KB,
+    MAX_ALLOWED_BYTES = 5 * ONE_MB;
 
 var express = require('express'),
     bodyParser = require('body-parser'),
@@ -36,16 +38,18 @@ router.route('/')
         });
     })
     .get(function(request, response) {
-        var bytes = parseInt(request.query.bytes || ONE_KB);
+        var bytes = +(request.query.bytes || ONE_KB);
         if (isNaN(bytes)) {
-            response.status(HttpStatus.BAD_REQUEST)
-                .json("failed to parse 'bytes' parameter");
-            return;
+            return response.status(HttpStatus.BAD_REQUEST)
+                .json('The number of bytes must be a number');
+        }
+        if (bytes > MAX_ALLOWED_BYTES) {
+            return response.status(HttpStatus.BAD_REQUEST)
+                .json('Max allowed bytes is ' + MAX_ALLOWED_BYTES);
         }
         acquireRandomDataBuffer(bytes, function(err, buffer) {
             if (err) {
-                response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
-                return;
+                return response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
             }
             response.write(buffer, function() {
                 response.status(HttpStatus.OK)
