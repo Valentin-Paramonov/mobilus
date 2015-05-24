@@ -12,7 +12,9 @@
         "jade": "~1.9.2",
         "express": "~4.12.4",
         "body-parser": "~1.12.4",
-        "http-status-codes": "~1.0.5"
+        "http-status-codes": "~1.0.5",
+        "monk": "~1.0.1",
+        "mongodb": "~2.0.33"
     },
     "repository": {
         "type": "git",
