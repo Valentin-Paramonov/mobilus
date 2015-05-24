@@ -11,6 +11,33 @@ module.exports = (function() {
 
     bodyParser.raw({ limit: '5mb' });
 
+    var writeRandomDataToResponse = function(bytes, response) {
+        acquireRandomDataBuffer(bytes, function(err, buffer) {
+            if (err) {
+                response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
+            } else {
+                response.write(buffer, function() {
+                    response.status(HttpStatus.OK)
+                        .end();
+                });
+            }
+        });
+    };
+
+    var acquireRandomDataBuffer = function(size, onBufferAcquired) {
+        fs.open('/dev/urandom', 'r', function(err, fd) {
+            if (err) {
+                onBufferAcquired(err);
+            } else {
+                var buffer = new Buffer(size);
+                fs.read(fd, buffer, 0, size, 0, function() {
+                    fs.close(fd);
+                });
+                onBufferAcquired(null, buffer);
+            }
+        });
+    };
+
     router.route('/')
         .post(function(request, response) {
             var stream = fs.createWriteStream('/dev/null');
@@ -19,44 +46,21 @@ module.exports = (function() {
             });
             request.on('end', function() {
                 stream.end();
-                response.status(HttpStatus.OK)
-                    .json();
+                response.sendStatus(HttpStatus.OK);
             });
         })
         .get(function(request, response) {
             var bytes = +(request.query.bytes || ONE_KB);
             if (isNaN(bytes)) {
-                return response.status(HttpStatus.BAD_REQUEST)
+                response.status(HttpStatus.BAD_REQUEST)
                     .json('The number of bytes must be a number');
-            }
-            if (bytes > MAX_ALLOWED_BYTES) {
-                return response.status(HttpStatus.BAD_REQUEST)
+            } else if (bytes > MAX_ALLOWED_BYTES) {
+                response.status(HttpStatus.BAD_REQUEST)
                     .json('Max allowed bytes is ' + MAX_ALLOWED_BYTES);
+            } else {
+                writeRandomDataToResponse(bytes, response);
             }
-            acquireRandomDataBuffer(bytes, function(err, buffer) {
-                if (err) {
-                    return response.sendStatus(HttpStatus.SERVICE_UNAVAILABLE);
-                }
-                response.write(buffer, function() {
-                    response.status(HttpStatus.OK)
-                        .end();
-                });
-            });
         });
-
-    function acquireRandomDataBuffer(size, onBufferAcquired) {
-        fs.open('/dev/urandom', 'r', function(err, fd) {
-            if (err) {
-                onBufferAcquired(err);
-                return;
-            }
-            var buffer = new Buffer(size);
-            fs.read(fd, buffer, 0, size, 0, function() {
-                fs.close(fd);
-            });
-            onBufferAcquired(null, buffer);
-        });
-    }
 
     return router;
 })();
